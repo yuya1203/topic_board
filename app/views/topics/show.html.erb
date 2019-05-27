@@ -1,0 +1,87 @@
+<% content_for :ogp do %>
+  <meta property="og:title" content ="<%= @topic.title %>" />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="/topics/<%= @topic.id %>" />
+  <meta property="og:image" content=<%= "#{root_url}#{@topic.image_url}" %> />
+  <meta property="og:site_name"  content="Techpit_Job" />
+  <meta property="og:description" content="<%= @topic.content %>" />
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@techpit_jp" />
+<% end %>
+<div class="container">
+  <div class="row">
+    <div class="col-md-6 offset-md-3">
+      <div class="job-show">
+        <ul class="list-group">
+          <li class="list-group">
+            <div class="card">
+              <img class="card-img-bottom" src="/<%= @topic.image_url %>" alt="Card image cap">
+              <div class="card-body">
+                <h5 class="card-title"><%= @topic.title %></h5>
+                <p class="card-text"><%= @topic.content %></p>
+                <p class="card-text"><small class="text-muted"><%= @topic.created_at.strftime('%Y/%m/%d %H:%M') %></small></p>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="topic-show-share">
+        <div class="social text-center">
+          <a href="https://twitter.com/intent/tweet?url=http://techpit.jp&text=テックピット&hashtags=#techpit" rel="nofollow" class="btn btn-xl btn-tw" target="_blank">twitterに投稿</a>
+        </div>
+        <p class="share-url"><a onclick="clipURL()" class="url-text">URL</a><i class="far fa-copy"></i></p>
+      </div>
+      <% if user_signed_in? %> <!-- ログインしている場合 -->
+        <% if @topic.user_id == current_user.id %> <!-- 自分の作成したトピックだった場合 -->
+          <div class="topic-show-comment">
+            <h2 class="topic-list-title">トピック一覧</h2>
+            <ul class="list-group">
+              <% @entries.each do |entry| %>
+                <li class="list-group-item">
+                  <div><%= entry.user.email %><small class="text-muted"><%= entry.created_at.strftime('%Y/%m/%d %H:%M') %></small></div>
+                  <div class="list-group-item-comment">
+                    <%= entry.messages %>
+                  </div>
+                </li>
+              <% end %>
+            </ul>
+          </div>
+        <% else %> <!-- 自分の作成したトピックではない場合 -->
+          <% if current_user.entries.where(topic_id: @topic.id).present? %>
+            <div class="intro-button text-center">
+              <a href="javascript:void(0)" class="btn btn-xl">すでに応募しています</a>
+            </div>
+          <% else %> <!-- まだ応募していない場合 -->
+            <%= form_with model: [@topic, @topic.entries.new] do |f| %>
+              <%= f.hidden_field :topic_id, value: @topic.id %>
+              <div class="form-group form-message">
+                <label for="exampleInputMessage">メッセージ（任意）</label>
+                <%= f.text_area :messages, class: "form-control", placeholder: "例：興味あります。よろしければDMでご連絡お待ちしております。" %>
+              </div>
+              <div class="intro-button text-center">
+                <%= f.submit "応募する", class: "btn btn-xl" %>
+              </div>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% else %> <!-- ログインしていない場合 -->
+        <div class="show-login text-center">
+          <div class="intro-button text-center">
+            <a href="/users/sign_in" class="btn btn-xl">応募する</a>
+          </div>
+          <p>応募するには会員登録・ログインの必要がございます</p>
+        </div>
+        <div class="topic-show-comment">
+          <ul>
+            <h2 class="topic-list-title">ご応募の流れ</h2>
+            <p>1. 応募するとアカウント情報が相手に届きます。</p>
+            <p>2. 必ず連絡が来るわけではありません。</p>
+            <p>3. 募集者がマッチしたと思った場合メッセージを送ります。</p>
+            <p>4. メッセージは連携SNSで届きます。</p>
+            <p>* Twitterで応募した場合は『』で『全てのユーザーからダイレクトメッセージを受信する』にチェックを入れてください。</p>
+          </ul>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

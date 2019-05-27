@@ -1,0 +1,52 @@
+<header class="masthead">
+  <div class="container">
+    <div class="intro-text">
+      <h2 class="intro-lead-in h2">SNSで簡単募集しよう！</h2>
+      <div class="intro-button">
+        <%= link_to '今すぐ始める', new_topic_path, class: "btn btn-xl" %>
+      </div>
+    </div>
+  </div>
+</header>
+<div class="container">
+  <div class="row">
+    <div class="col-md-6 offset-md-1">
+      <div class="topic-show-left">
+        <h2 class="topic-list-title"><%= current_user.email %>さんの募集一覧</h2>
+        <ul class="list-group">
+          <% @topics.each do |topic| %> <!-- トピック一覧表示 -->
+            <%= link_to topic_path(topic), class: "no-text-decoration" do %>
+              <li class="list-group">
+                <div class="card">
+                  <img class="card-img-bottom" src="/<%= topic.image_url %>" alt="">
+                  <div class="card-body">
+                    <h5 class="card-title"><%= topic.title %></h5>
+                    <p class="card-text"><%= topic.content %></p>
+                    <p class="card-text"><small class="text-muted"><%= topic.created_at.strftime('%Y/%m/%d %H:%M') %></small></p>
+                  </div>
+                </div>
+              </li>
+            <% end %>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="topic-show-left">
+        <h2 class="entry-list-title">新着応募</h2>
+        <ul class="list-group">
+          <% @entries.each do |entry| %>
+            <% if entry.topic.user_id == current_user.id %> <!-- 自分の作成した募集へのエントリーの場合 -->
+              <li class="list-group-item">
+                <div><%= entry.topic.user.email %><small class="text-muted"><%= entry.topic.created_at.strftime('%Y/%m/%d %H:%M') %></small></div>
+                <div class="list-group-item-comment">
+                  <%= entry.messages %>
+                </div>
+              </li>
+            <% end %>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
